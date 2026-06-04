@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PAL-DFI — Blockchain & Data Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --green-dark:   #1a3d2b;
+    --green-mid:    #2d6a45;
+    --green-light:  #4a9460;
+    --green-pale:   #e8f4ed;
+    --navy:         #0f2236;
+    --navy-mid:     #1c3a55;
+    --ink:          #1a1a2e;
+    --ink-soft:     #3d3d5c;
+    --warm-white:   #f9f8f5;
+    --rule:         #c8ddd0;
+    --gold-accent:  #8fbc8f;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--warm-white);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(160deg, var(--navy) 0%, var(--green-dark) 55%, var(--green-mid) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 80%, rgba(74,148,96,0.18) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(143,188,143,0.12) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .cover-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .cover-logo {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    margin-bottom: 40px;
+    filter: drop-shadow(0 8px 32px rgba(0,0,0,0.4));
+    animation: fadeUp 1s ease both;
+  }
+  .cover-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-accent);
+    margin-bottom: 16px;
+    animation: fadeUp 1s 0.15s ease both;
+  }
+  .cover-title {
+    font-family: 'EB Garamond', serif;
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.15;
+    max-width: 700px;
+    animation: fadeUp 1s 0.25s ease both;
+  }
+  .cover-title span {
+    color: var(--gold-accent);
+  }
+  .cover-sub {
+    font-family: 'Barlow', sans-serif;
+    font-size: 17px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.7);
+    margin-top: 14px;
+    letter-spacing: 0.5px;
+    animation: fadeUp 1s 0.35s ease both;
+  }
+  .cover-divider {
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
+    margin: 36px auto;
+    animation: fadeUp 1s 0.45s ease both;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 60px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 1s 0.55s ease both;
+  }
+  .cover-meta-item {
+    text-align: center;
+  }
+  .cover-meta-item .label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-accent);
+    font-family: 'Barlow Condensed', sans-serif;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .cover-meta-item .value {
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ── TOC ── */
+  .toc-section {
+    background: var(--navy);
+    color: white;
+    padding: 80px 0;
+  }
+  .toc-section .wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 48px;
+    align-items: start;
+  }
+  .toc-section h2 {
+    font-family: 'EB Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--gold-accent);
+    grid-column: 1 / -1;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(143,188,143,0.25);
+    letter-spacing: 0.5px;
+  }
+  .toc-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.72);
+    padding: 4px 0;
+    border-bottom: 1px dotted rgba(255,255,255,0.1);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc-entry:hover { color: var(--gold-accent); }
+  .toc-entry .toc-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    color: var(--green-light);
+    min-width: 24px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  /* ── SECTIONS ── */
+  .doc-section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .doc-section:nth-child(even) {
+    background: #f4f7f5;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .section-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--green-light);
+    min-width: 36px;
+    padding-top: 6px;
+  }
+  .section-title {
+    font-family: 'EB Garamond', serif;
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 700;
+    color: var(--green-dark);
+    line-height: 1.2;
+  }
+  .section-title::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background: var(--green-mid);
+    margin-top: 10px;
+    border-radius: 2px;
+  }
+
+  p {
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+    font-size: 15.5px;
+  }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── PRINCIPLE CARDS ── */
+  .principles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    margin-top: 28px;
+  }
+  .principle-card {
+    background: white;
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--green-mid);
+    padding: 24px;
+    border-radius: 2px;
+  }
+  .principle-card h4 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    margin-bottom: 10px;
+  }
+  .principle-card p {
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ── DATA BLOCKS ── */
+  .data-block {
+    background: white;
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--green-mid);
+    padding: 24px 28px;
+    margin: 24px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .data-block h4 {
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green-mid);
+    margin-bottom: 12px;
+  }
+  .data-block ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .data-block ul li {
+    font-family: 'Barlow', monospace;
+    font-size: 13px;
+    background: var(--green-pale);
+    color: var(--green-dark);
+    padding: 4px 12px;
+    border-radius: 2px;
+    border: 1px solid var(--rule);
+    font-weight: 500;
+  }
+
+  /* ── ORG CARDS ── */
+  .org-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .org-card {
+    background: white;
+    border: 1px solid var(--rule);
+    padding: 20px;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .org-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green-dark), var(--green-light));
+  }
+  .org-card .org-role {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--green-mid);
+    font-weight: 600;
+    font-family: 'Barlow Condensed', sans-serif;
+    margin-bottom: 6px;
+  }
+  .org-card h4 {
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+  .org-card .node-list {
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.8;
+  }
+  .org-card .node-list code {
+    font-family: monospace;
+    background: var(--green-pale);
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 11px;
+    display: inline-block;
+    margin: 2px 0;
+  }
+
+  /* ── CHANNEL TABLE ── */
+  .channel-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+    background: white;
+    border: 1px solid var(--rule);
+  }
+  .channel-table th {
+    background: var(--green-dark);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    text-align: left;
+  }
+  .channel-table td {
+    padding: 14px 20px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  .channel-table tr:last-child td { border-bottom: none; }
+  .channel-table tr:hover td { background: var(--green-pale); }
+
+  /* ── PHASE TIMELINE ── */
+  .phase-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+  .phase-card {
+    background: white;
+    border: 1px solid var(--rule);
+    padding: 28px;
+    border-radius: 2px;
+    position: relative;
+  }
+  .phase-card.phase-1 { border-top: 4px solid var(--green-mid); }
+  .phase-card.phase-2 { border-top: 4px solid var(--navy-mid); }
+  .phase-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .phase-1 .phase-badge { color: var(--green-mid); }
+  .phase-2 .phase-badge { color: var(--navy-mid); }
+  .phase-card h4 {
+    font-family: 'EB Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 16px;
+  }
+  .phase-list {
+    list-style: none;
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 2;
+  }
+  .phase-list li::before {
+    content: '→ ';
+    color: var(--green-mid);
+    font-weight: 700;
+  }
+
+  /* ── SCENARIO FLOW ── */
+  .flow-steps {
+    counter-reset: flow;
+    margin-top: 24px;
+  }
+  .flow-step {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+  .flow-step-num {
+    counter-increment: flow;
+    min-width: 36px;
+    height: 36px;
+    background: var(--green-dark);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .flow-step-text {
+    font-size: 15px;
+    color: var(--ink-soft);
+    padding-top: 6px;
+    line-height: 1.6;
+  }
+  .flow-step-text strong {
+    color: var(--green-dark);
+  }
+
+  /* ── PRIVACY CALLOUT ── */
+  .privacy-callout {
+    background: var(--green-dark);
+    color: white;
+    padding: 36px 40px;
+    margin: 32px 0;
+    border-radius: 2px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .privacy-callout .icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .privacy-callout h4 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-accent);
+    margin-bottom: 8px;
+  }
+  .privacy-callout p {
+    color: rgba(255,255,255,0.82);
+    font-size: 15px;
+    margin: 0;
+  }
+
+  /* ── SECURITY GRID ── */
+  .security-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .security-item {
+    background: white;
+    border: 1px solid var(--rule);
+    padding: 14px 16px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 2px;
+  }
+  .security-item::before {
+    content: '✓';
+    color: var(--green-mid);
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* ── CONCLUSION ── */
+  .conclusion {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--green-dark) 100%);
+    padding: 80px 0;
+    color: white;
+  }
+  .conclusion .wrapper {
+    text-align: center;
+  }
+  .conclusion img {
+    width: 80px;
+    margin-bottom: 28px;
+    opacity: 0.9;
+    filter: brightness(1.1);
+  }
+  .conclusion h2 {
+    font-family: 'EB Garamond', serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: white;
+  }
+  .conclusion p {
+    color: rgba(255,255,255,0.75);
+    max-width: 580px;
+    margin: 0 auto 16px;
+    font-size: 16px;
+  }
+  .version-chip {
+    display: inline-block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    background: rgba(143,188,143,0.2);
+    border: 1px solid rgba(143,188,143,0.35);
+    color: var(--gold-accent);
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-top: 28px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy);
+    padding: 24px 40px;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    font-family: 'Barlow', sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 640px) {
+    .wrapper { padding: 0 20px; }
+    .toc-section .wrapper { grid-template-columns: 1fr; }
+    .phase-grid { grid-template-columns: 1fr; }
+    .cover-meta { gap: 30px; }
+    .privacy-callout { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     COVER
+════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-grid"></div>
+  <img class="cover-logo" src="C:\Users\3176\Downloads\ProjectLogo.png" alt="PAL-DFI Logo" />
+  <div class="cover-tag">Solution Architecture Document</div>
+  <h1 class="cover-title">Blockchain & Data<br><span>Architecture</span></h1>
+  <p class="cover-sub">Palestinian Decentralized Financial Identity Network</p>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <span class="label">Prepared For</span>
+      <span class="value">Palestine Monetary Authority</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="label">Prepared By</span>
+      <span class="value">PAL-DFI Team</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="label">Version</span>
+      <span class="value">1.0</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="label">Classification</span>
+      <span class="value">Solution Architecture</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     TABLE OF CONTENTS
+════════════════════════════════════════ -->
+<section class="toc-section">
+  <div class="wrapper">
+    <h2>Contents</h2>
+    <a class="toc-entry" href="#s1"><span class="toc-num">01</span> Executive Summary</a>
+    <a class="toc-entry" href="#s2"><span class="toc-num">02</span> Architecture Principles</a>
+    <a class="toc-entry" href="#s3"><span class="toc-num">03</span> Blockchain Architecture Overview</a>
+    <a class="toc-entry" href="#s4"><span class="toc-num">04</span> Governance Model</a>
+    <a class="toc-entry" href="#s5"><span class="toc-num">05</span> Network Design</a>
+    <a class="toc-entry" href="#s6"><span class="toc-num">06</span> Blockchain Organizations</a>
+    <a class="toc-entry" href="#s7"><span class="toc-num">07</span> Network Channels</a>
+    <a class="toc-entry" href="#s8"><span class="toc-num">08</span> Smart Contract Architecture</a>
+    <a class="toc-entry" href="#s9"><span class="toc-num">09</span> Trust Registry</a>
+    <a class="toc-entry" href="#s10"><span class="toc-num">10</span> DID Registry</a>
+    <a class="toc-entry" href="#s11"><span class="toc-num">11</span> Credential & Revocation Registries</a>
+    <a class="toc-entry" href="#s12"><span class="toc-num">12</span> Audit Architecture</a>
+    <a class="toc-entry" href="#s13"><span class="toc-num">13</span> Security Architecture</a>
+    <a class="toc-entry" href="#s14"><span class="toc-num">14</span> Data Architecture Overview</a>
+    <a class="toc-entry" href="#s15"><span class="toc-num">15</span> Data Domains</a>
+    <a class="toc-entry" href="#s16"><span class="toc-num">16</span> Database Architecture</a>
+    <a class="toc-entry" href="#s17"><span class="toc-num">17</span> Data Lifecycle & Privacy</a>
+    <a class="toc-entry" href="#s18"><span class="toc-num">18</span> End-to-End Scenario</a>
+    <a class="toc-entry" href="#s19"><span class="toc-num">19</span> Phase 1: Sandbox</a>
+    <a class="toc-entry" href="#s20"><span class="toc-num">20</span> Phase 2: National Rollout</a>
+    <a class="toc-entry" href="#s21"><span class="toc-num">21</span> Conclusion</a>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S1 — EXECUTIVE SUMMARY
+════════════════════════════════════════ -->
+<section class="doc-section" id="s1">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Executive Summary</h2>
+    </div>
+    <p>PAL-DFI is a national trust infrastructure built to give Palestinians a secure, privacy-respecting digital identity they actually own. Rather than centralizing sensitive data in a single government database, the network lets citizens hold their own credentials in a mobile wallet and share only what a specific transaction requires.</p>
+    <p>The platform connects financial institutions, government agencies, and telecommunications providers through a blockchain-governed trust framework operated by the Palestine Monetary Authority. When a bank needs to confirm that a customer is who they say they are, it doesn't need to call the Ministry of Interior directly. It checks a cryptographic proof the citizen presents from their wallet, validated against the blockchain's trust layer. No raw data changes hands unless the citizen agrees.</p>
+    <p>Technically, PAL-DFI runs on Hyperledger Fabric and fully adopts W3C standards for Decentralized Identifiers and Verifiable Credentials. Protocol-level interoperability is handled through OpenID4VCI, OpenID4VP, OAuth2, and OpenID Connect, so institutions don't need to rework their existing systems to participate.</p>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S2 — ARCHITECTURE PRINCIPLES
+════════════════════════════════════════ -->
+<section class="doc-section" id="s2">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Architecture Principles</h2>
+    </div>
+    <p>Every decision in this architecture traces back to a small set of commitments. They aren't aspirational statements — they shape what gets built and what doesn't.</p>
+    <div class="principles-grid">
+      <div class="principle-card">
+        <h4>Trust by Design</h4>
+        <p>Trust is earned through cryptographic verification and approved participant status, not through assumed relationships between institutions.</p>
+      </div>
+      <div class="principle-card">
+        <h4>Privacy by Design</h4>
+        <p>No citizen personal information lives on the blockchain. The chain records hashes and status flags, nothing that identifies a person.</p>
+      </div>
+      <div class="principle-card">
+        <h4>Data Minimization</h4>
+        <p>Verifiers receive only the specific attributes a transaction requires. A bank confirming residency doesn't receive date of birth unless it asks, and the citizen must consent.</p>
+      </div>
+      <div class="principle-card">
+        <h4>Decentralized Trust</h4>
+        <p>Each participant keeps ownership of their own source systems. PAL-DFI provides shared infrastructure for trust — not a centralized data store.</p>
+      </div>
+      <div class="principle-card">
+        <h4>Regulatory Governance</h4>
+        <p>PMA governs participation, trust policies, and compliance across the network. Clear lines of authority prevent ambiguity about who approves what.</p>
+      </div>
+      <div class="principle-card">
+        <h4>Standards-Based Interoperability</h4>
+        <p>All integrations must comply with W3C DID, W3C VC, OpenID4VCI, and OpenID4VP. Proprietary integrations are not permitted at the protocol level.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S3 — BLOCKCHAIN ARCHITECTURE OVERVIEW
+════════════════════════════════════════ -->
+<section class="doc-section" id="s3">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Blockchain Architecture Overview</h2>
+    </div>
+    <p>The blockchain is the trust layer of PAL-DFI, not its data store. It answers one type of question reliably: can this credential be trusted right now? Everything else — the credential itself, the citizen's identity details, transaction records — lives off-chain in the appropriate institutional systems.</p>
+    <p>Specifically, the blockchain handles trust management, credential status verification, issuer and verifier governance, revocation tracking, and immutable audit anchoring. It deliberately does not hold citizen identity data or credential content. That boundary is fundamental to the privacy model.</p>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S4 — GOVERNANCE MODEL
+════════════════════════════════════════ -->
+<section class="doc-section" id="s4">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Blockchain Governance Model</h2>
+    </div>
+    <p>The Palestine Monetary Authority owns and operates the network. That isn't a formality — PMA has final say on who can join, what policies govern participation, and when smart contracts get deployed or updated. In practice this means a new institution wanting to issue credentials must apply to PMA, satisfy its compliance requirements, and receive explicit approval before its node joins the network.</p>
+    <p>PMA's governance responsibilities cover network participation decisions, trust policy definition, audit supervision, and compliance oversight. The concentration of authority is intentional: decentralized identity infrastructure still needs a regulated entity accountable for the rules of the road.</p>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S5 — NETWORK DESIGN
+════════════════════════════════════════ -->
+<section class="doc-section" id="s5">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Network Design</h2>
+    </div>
+    <p>PAL-DFI runs on Hyperledger Fabric as a permissioned consortium blockchain. Not every blockchain suits a regulated national identity network — permissioned architecture means that unknown participants cannot join, and every transaction can be traced to an approved organization.</p>
+    <p>Consensus is handled through RAFT, chosen for its proven reliability in high-availability environments and its compatibility with the regulatory oversight requirements here. The network is designed for transaction immutability, controlled participation, and the kind of audit transparency a central bank needs.</p>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S6 — ORGANIZATIONS
+════════════════════════════════════════ -->
+<section class="doc-section" id="s6">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Blockchain Organizations</h2>
+    </div>
+    <p>Each participating institution operates its own peer nodes within a distinct organizational boundary. The initial participant set reflects the core institutions needed to issue and verify identity at a national level.</p>
+    <div class="org-grid">
+      <div class="org-card">
+        <div class="org-role">Network Governor</div>
+        <h4>Palestine Monetary Authority</h4>
+        <div class="node-list">
+          <code>PMA-Peer-01</code><br>
+          <code>PMA-Peer-02</code><br>
+          <code>PMA-Orderer-01</code>
+        </div>
+      </div>
+      <div class="org-card">
+        <div class="org-role">Identity Authority</div>
+        <h4>Ministry of Interior</h4>
+        <div class="node-list">
+          <code>MOI-Peer-01</code>
+        </div>
+      </div>
+      <div class="org-card">
+        <div class="org-role">Telecom Issuer</div>
+        <h4>Jawwal</h4>
+        <div class="node-list">
+          <code>Jawwal-Peer-01</code>
+        </div>
+      </div>
+      <div class="org-card">
+        <div class="org-role">Financial Issuer & Verifier</div>
+        <h4>Banks</h4>
+        <div class="node-list">
+          <code>Bank-Peer-01</code><br>(per institution)
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S7 — CHANNELS
+════════════════════════════════════════ -->
+<section class="doc-section" id="s7">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Network Channels</h2>
+    </div>
+    <p>Hyperledger Fabric channels allow different subsets of participants to transact privately within the same network. PAL-DFI uses three channels with tightly defined purposes and membership.</p>
+    <table class="channel-table">
+      <thead>
+        <tr>
+          <th>Channel</th>
+          <th>Purpose</th>
+          <th>Participants</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Governance Channel</strong></td>
+          <td>Network-level governance operations — policy updates, participant decisions</td>
+          <td>PMA only</td>
+        </tr>
+        <tr>
+          <td><strong>Trust Channel</strong></td>
+          <td>Participant trust management — issuer and verifier registration</td>
+          <td>PMA, MOI, Jawwal, Banks</td>
+        </tr>
+        <tr>
+          <td><strong>Credential Status Channel</strong></td>
+          <td>Credential verification support — status checks and revocation queries</td>
+          <td>All approved organizations</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S8 — SMART CONTRACTS
+════════════════════════════════════════ -->
+<section class="doc-section" id="s8">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2 class="section-title">Smart Contract Architecture</h2>
+    </div>
+    <p>Smart contracts are the enforcement mechanism for the trust framework. Each contract category handles a distinct function, and PMA controls which contracts are deployed and when they are updated.</p>
+    <div class="data-block">
+      <h4>Contract Categories</h4>
+      <ul>
+        <li>Trust Registry Contract</li>
+        <li>DID Registry Contract</li>
+        <li>Credential Registry Contract</li>
+        <li>Revocation Registry Contract</li>
+        <li>Audit Contract</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S9 — TRUST REGISTRY
+════════════════════════════════════════ -->
+<section class="doc-section" id="s9">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2 class="section-title">Trust Registry</h2>
+    </div>
+    <p>The Trust Registry is the list of who is permitted to do what in the network. Before any institution can issue or verify credentials, it must appear here in an active state. The registry exposes functions to register, suspend, and reactivate both issuers and verifiers, giving PMA direct control over participation status.</p>
+    <div class="data-block">
+      <h4>Stored Data</h4>
+      <ul>
+        <li>Participant ID</li>
+        <li>Participant DID</li>
+        <li>Status</li>
+        <li>Approval Date</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S10 — DID REGISTRY
+════════════════════════════════════════ -->
+<section class="doc-section" id="s10">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <h2 class="section-title">DID Registry</h2>
+    </div>
+    <p>The DID Registry anchors decentralized identifiers to the blockchain without recording anything personally identifiable. When a citizen's wallet creates a DID, a public key hash and status flag are written on-chain. That's enough for a verifier to confirm cryptographic authenticity without ever knowing the citizen's name, address, or any attribute.</p>
+    <div class="data-block">
+      <h4>Stored Data</h4>
+      <ul>
+        <li>DID</li>
+        <li>Public Key Hash</li>
+        <li>Status</li>
+        <li>Creation Timestamp</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S11 — CREDENTIAL & REVOCATION REGISTRIES
+════════════════════════════════════════ -->
+<section class="doc-section" id="s11">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <h2 class="section-title">Credential & Revocation Registries</h2>
+    </div>
+    <p>The Credential Registry doesn't store credentials — it stores proof that a credential was legitimately issued. When a verifier wants to confirm a presentation hasn't been tampered with, it checks the credential's hash against this registry. The actual credential content stays in the citizen's wallet.</p>
+    <div class="data-block">
+      <h4>Credential Registry — Stored Data</h4>
+      <ul>
+        <li>Credential Hash</li>
+        <li>Issuer DID</li>
+        <li>Credential Type</li>
+        <li>Issue Date</li>
+        <li>Status</li>
+      </ul>
+    </div>
+    <p style="margin-top:24px;">The Revocation Registry tracks credentials that have been invalidated — a national ID that was replaced after loss, a KYC credential revoked after fraud detection. Any verifier can check revocation status in real time without contacting the original issuer.</p>
+    <div class="data-block">
+      <h4>Revocation Registry — Stored Data</h4>
+      <ul>
+        <li>Credential Hash</li>
+        <li>Revocation Status</li>
+        <li>Reason Code</li>
+        <li>Timestamp</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S12 — AUDIT ARCHITECTURE
+════════════════════════════════════════ -->
+<section class="doc-section" id="s12">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">12</span>
+      <h2 class="section-title">Audit Architecture</h2>
+    </div>
+    <p>Regulatory accountability requires a record that cannot be altered after the fact. The Audit Contract writes cryptographic anchors of significant events to the blockchain — not the event data itself, but a hash that can later confirm whether off-chain audit logs have been tampered with. PMA uses these anchors during investigations and compliance reviews.</p>
+    <div class="data-block">
+      <h4>Stored Data</h4>
+      <ul>
+        <li>Audit Anchor ID</li>
+        <li>Hash</li>
+        <li>Source System</li>
+        <li>Timestamp</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S13 — SECURITY
+════════════════════════════════════════ -->
+<section class="doc-section" id="s13">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">13</span>
+      <h2 class="section-title">Security Architecture</h2>
+    </div>
+    <p>Security in PAL-DFI operates at multiple layers simultaneously. Transport encryption, identity management, access control, and hardware-backed key storage each protect different attack surfaces. No single control is relied upon exclusively.</p>
+    <div class="security-grid">
+      <div class="security-item">TLS Encryption</div>
+      <div class="security-item">MSP Identity Management</div>
+      <div class="security-item">Certificate Authorities</div>
+      <div class="security-item">Role-Based Access Control</div>
+      <div class="security-item">Smart Contract Authorization</div>
+      <div class="security-item">Hardware Security Modules</div>
+      <div class="security-item">Transaction Signing</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S14 — DATA ARCHITECTURE OVERVIEW
+════════════════════════════════════════ -->
+<section class="doc-section" id="s14">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">14</span>
+      <h2 class="section-title">Data Architecture Overview</h2>
+    </div>
+    <p>PAL-DFI's data architecture is deliberately fragmented — not because fragmentation is convenient, but because it is what privacy requires. There is no single database where a complete picture of any citizen could be reconstructed. Different data domains live with their natural owners, and the blockchain holds only what is needed to verify trust status.</p>
+    <div class="data-block">
+      <h4>Data Domains</h4>
+      <ul>
+        <li>Identity Domain</li>
+        <li>DID Domain</li>
+        <li>Credential Domain</li>
+        <li>Verification Domain</li>
+        <li>Consent Domain</li>
+        <li>Trust Domain</li>
+        <li>Governance Domain</li>
+        <li>Audit Domain</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S15 — DATA DOMAINS
+════════════════════════════════════════ -->
+<section class="doc-section" id="s15">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">15</span>
+      <h2 class="section-title">Key Data Domains</h2>
+    </div>
+
+    <p><strong>Identity Domain</strong> — Owned by the Ministry of Interior. National ID, citizen name, date of birth, and nationality live exclusively within MOI systems and are never replicated to the blockchain or any shared repository.</p>
+
+    <p><strong>Credential Domain</strong> — Owned by the respective issuers. National Identity Credentials come from MOI, SIM Ownership Credentials from Jawwal, KYC and Account Ownership Credentials from banks. Metadata such as issue date, expiry, and type is shared; credential content is not.</p>
+
+    <p><strong>Consent Domain</strong> — Citizen-controlled. Before any credential attribute is shared with a verifier, a consent record is created capturing who requested it, for what purpose, and when the consent expires. Citizens can review and withdraw consent.</p>
+
+    <p><strong>Trust and Governance Domains</strong> — Both owned and operated by PMA. These cover issuer and verifier registry data, governance policies, compliance rules, and network configuration. They are the operational core of PMA's regulatory function.</p>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S16 — DATABASE ARCHITECTURE
+════════════════════════════════════════ -->
+<section class="doc-section" id="s16">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">16</span>
+      <h2 class="section-title">Database Architecture</h2>
+    </div>
+    <p>Physical databases follow the domain ownership model. Each institution manages its own data stores; PAL-DFI core infrastructure adds the shared operational databases needed for DID, credential, verification, and consent management.</p>
+
+    <div class="data-block">
+      <h4>PMA Databases</h4>
+      <ul><li>governance_db</li><li>trust_db</li><li>audit_db</li><li>policy_db</li></ul>
+    </div>
+    <div class="data-block">
+      <h4>PAL-DFI Core Databases</h4>
+      <ul><li>did_db</li><li>credential_db</li><li>verification_db</li><li>consent_db</li></ul>
+    </div>
+    <div class="data-block">
+      <h4>Issuer Databases</h4>
+      <ul><li>MOI Identity Database</li><li>Jawwal Subscriber Database</li><li>Bank Core Banking Systems</li></ul>
+    </div>
+    <div class="data-block">
+      <h4>Blockchain Ledger Contains</h4>
+      <ul><li>DID references</li><li>Credential hashes</li><li>Trust records</li><li>Revocation records</li><li>Audit anchors</li></ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S17 — LIFECYCLE & PRIVACY
+════════════════════════════════════════ -->
+<section class="doc-section" id="s17">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">17</span>
+      <h2 class="section-title">Data Lifecycle & Privacy</h2>
+    </div>
+    <p>Every credential follows a defined lifecycle: creation, validation, storage, active use, revocation, archiving, and eventual deletion. All transitions generate auditable events. There is no undefined state where data sits in limbo outside the governance model.</p>
+
+    <div class="privacy-callout">
+      <div class="icon">🔒</div>
+      <div>
+        <h4>Privacy Commitments</h4>
+        <p>There is no centralized citizen identity repository. No biometric data is stored on-chain. Credential contents never touch the blockchain. Selective disclosure is used wherever technically possible. Citizens must give explicit consent before any credential attribute is shared with a third party.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S18 — END-TO-END SCENARIO
+════════════════════════════════════════ -->
+<section class="doc-section" id="s18">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">18</span>
+      <h2 class="section-title">End-to-End Scenario</h2>
+    </div>
+    <p>Here is what the full flow looks like for a citizen opening a bank account using PAL-DFI credentials.</p>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-text">Citizen installs the <strong>PAL-DFI Wallet</strong> on their phone.</div></div>
+      <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-text">The wallet generates a <strong>Decentralized Identifier</strong> (DID) locally on the device.</div></div>
+      <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-text">The DID's public key hash is <strong>anchored on the blockchain</strong> via the DID Registry.</div></div>
+      <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-text">The citizen visits <strong>Ministry of Interior</strong>, which verifies their physical identity documents.</div></div>
+      <div class="flow-step"><div class="flow-step-num">5</div><div class="flow-step-text">MOI issues a <strong>National Identity Credential</strong>, delivered directly to the citizen's wallet.</div></div>
+      <div class="flow-step"><div class="flow-step-num">6</div><div class="flow-step-text">The credential is <strong>stored in the wallet</strong> — not on a government server, not on the blockchain.</div></div>
+      <div class="flow-step"><div class="flow-step-num">7</div><div class="flow-step-text">A bank requests identity verification. The citizen's wallet generates a <strong>Verifiable Presentation</strong>.</div></div>
+      <div class="flow-step"><div class="flow-step-num">8</div><div class="flow-step-text">The bank verifies the <strong>cryptographic signature, DID status, issuer trust status, and revocation status</strong> — all without contacting MOI.</div></div>
+      <div class="flow-step"><div class="flow-step-num">9</div><div class="flow-step-text">The verification result is recorded and an <strong>audit anchor is written to the blockchain</strong>.</div></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S19 — PHASE 1
+════════════════════════════════════════ -->
+<section class="doc-section" id="s19">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">19</span>
+      <h2 class="section-title">Phase 1: Sandbox Architecture</h2>
+    </div>
+    <p>The first deployment is a controlled sandbox running in a Palestinian on-premise data center. It includes a small but representative participant set, enough to test the full credential lifecycle end-to-end before a national rollout.</p>
+    <div class="phase-grid">
+      <div class="phase-card phase-1">
+        <div class="phase-badge">Phase 1</div>
+        <h4>Sandbox Participants</h4>
+        <ul class="phase-list">
+          <li>PMA</li>
+          <li>Ministry of Interior</li>
+          <li>Jawwal</li>
+          <li>One bank</li>
+        </ul>
+      </div>
+      <div class="phase-card phase-1">
+        <div class="phase-badge">Phase 1</div>
+        <h4>Capabilities</h4>
+        <ul class="phase-list">
+          <li>DID issuance</li>
+          <li>Credential issuance</li>
+          <li>Credential verification</li>
+          <li>Revocation management</li>
+          <li>Trust management</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     S20 — PHASE 2
+════════════════════════════════════════ -->
+<section class="doc-section" id="s20">
+  <div class="wrapper">
+    <div class="section-header">
+      <span class="section-num">20</span>
+      <h2 class="section-title">Phase 2: National Rollout</h2>
+    </div>
+    <p>Phase 2 expands both the participant base and the infrastructure. The network moves to a government cloud environment with a dedicated disaster recovery site and multi-region architecture to meet the reliability requirements of national-scale service delivery.</p>
+    <div class="phase-grid">
+      <div class="phase-card phase-2">
+        <div class="phase-badge">Phase 2</div>
+        <h4>Additional Participants</h4>
+        <ul class="phase-list">
+          <li>Universities</li>
+          <li>Insurance companies</li>
+          <li>Government agencies</li>
+          <li>FinTech providers</li>
+        </ul>
+      </div>
+      <div class="phase-card phase-2">
+        <div class="phase-badge">Phase 2</div>
+        <h4>Infrastructure</h4>
+        <ul class="phase-list">
+          <li>Government Cloud</li>
+          <li>Disaster Recovery Site</li>
+          <li>Multi-region architecture</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     CONCLUSION
+════════════════════════════════════════ -->
+<section class="conclusion" id="s21">
+  <div class="wrapper">
+    <img src="/mnt/user-data/uploads/ProjectLogo.png" alt="PAL-DFI" />
+    <h2>Conclusion</h2>
+    <p>PAL-DFI builds something Palestine has not had before — a trust infrastructure where financial institutions, government agencies, and telecommunications providers can verify citizen credentials reliably, without needing to call each other or maintain shared databases of sensitive information.</p>
+    <p>The architecture keeps the PMA in clear regulatory control, gives citizens ownership of their own credentials, and uses open international standards so the network can grow without locking anyone into proprietary technology.</p>
+    <p>The result is a foundation for a Palestinian digital economy built on genuine trust — not on assumptions.</p>
+    <div class="version-chip">Version 1.0 — PAL-DFI Team</div>
+  </div>
+</section>
+
+<footer>
+  PAL-DFI — Palestinian Decentralized Financial Identity &nbsp;|&nbsp; Prepared for Palestine Monetary Authority &nbsp;|&nbsp; Classification: Solution Architecture
+</footer>
+
+</body>
+</html>
